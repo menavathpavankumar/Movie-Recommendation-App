@@ -1,14 +1,29 @@
-# omdb_utils.py
 import requests
 
-def get_movie_details(title, api_key):
+def get_movie_details(movie_title, api_key):
 
-    url = f"http://www.omdbapi.com/?t={title}&plot=full&apikey={api_key}"
-    res = requests.get(url).json()
-    if res.get("Response") == "True":
-        result = res.get("Plot", "N/A"), res.get("Poster", "N/A")
-        plot = result[0]
-        poster = result[1]
-        return plot, poster
+    url = f"http://www.omdbapi.com/?t={movie_title}&apikey={api_key}"
 
-    return "N/A", "N/A"
+    try:
+        response = requests.get(url)
+        data = response.json()
+
+        return {
+            "poster": data.get("Poster", "N/A"),
+            "rating": data.get("imdbRating", "N/A"),
+            "year": data.get("Year", "N/A"),
+            "plot": data.get("Plot", "Plot not available"),
+            "title": data.get("Title", movie_title)
+        }
+
+    except Exception as e:
+
+        print("ERROR:", e)
+
+        return {
+            "poster": "N/A",
+            "rating": "N/A",
+            "year": "N/A",
+            "plot": "Plot not available",
+            "title": movie_title
+        }
